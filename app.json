@@ -27,6 +27,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+<<<<<<< HEAD
       "expo-router",
       [
         "expo-image-picker",
@@ -34,6 +35,9 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
+=======
+      "expo-router"
+>>>>>>> c3ee97ab3049f1585321e871a8b6094dd3b47377
     ],
     "experiments": {
       "typedRoutes": true
