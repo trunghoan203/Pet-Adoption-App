@@ -1,35 +1,19 @@
-import { Pressable, Text, View } from "react-native";
-import { Link, Redirect, useRootNavigationState, useRouter } from "expo-router";
-import { useUser } from "@clerk/clerk-expo";
-import { useEffect } from "react";
-
+import { View, Text } from "react-native";
+import Login from "../components/Login";
+import { auth } from '../config/FirebaseConfig'
+import { Redirect } from "expo-router";
 
 export default function Index() {
 
-  const { user } = useUser();
+  const user = auth.currentUser;
 
-  const rootNavigationState = useRootNavigationState();
-
-  useEffect(() => {
-    CheckNavLoaded();
-  }, [])
-
-  const CheckNavLoaded = () => {
-    if (!rootNavigationState.key)
-      return null;
-  }
-
-  return user && (
-    <View
-      style={{
-        flex: 1,
-
-      }}
-    >
-      {user ?
-        <Redirect href={'/(tabs)/home'} /> :
-        <Redirect href={'/login/index'} />}
-
+  return (
+    <View style={{
+      flex: 1,
+    }}>
+      {user ? <Redirect href={'/home'} /> :
+        <Login />
+      }
     </View>
   );
 }

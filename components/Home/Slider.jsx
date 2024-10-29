@@ -1,37 +1,37 @@
-import { View, Text, FlatList, Dimensions } from 'react-native'
-import React, {useEffect, useState} from 'react';
-import {collection, getDocs} from 'firebase/firestore';
-import {db} from './../../config/FirebaseConfig';
+import { View, FlatList, Dimensions } from 'react-native'
+import React, { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './../../config/FirebaseConfig';
 import { StyleSheet, Image } from 'react-native';
 
 export default function Slider() {
 
-  const [sliderList, setSliderList]=useState([]);
-    useEffect(()=>{
-        GetSliders();
-    },[])
+  const [sliderList, setSliderList] = useState([]);
+  useEffect(() => {
+    GetSliders();
+  }, [])
 
-    const GetSliders = async()=>{
-      setSliderList([]);
-        const snapshot=await getDocs(collection(db, 'Sliders'));
-        snapshot.forEach((doc)=>{
-          console.log(doc.data());
-          setSliderList(sliderList=>[...sliderList,doc.data()]);
-        })
-      }
+  const GetSliders = async () => {
+    setSliderList([]);
+    const snapshot = await getDocs(collection(db, 'Sliders'));
+    snapshot.forEach((doc) => {
+      console.log(doc.data());
+      setSliderList(sliderList => [...sliderList, doc.data()]);
+    })
+  }
 
   return (
     <View style={{
-      marginTop:15
+      marginTop: 15
     }}>
-      <FlatList 
+      <FlatList
         data={sliderList}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        renderItem={({item, index})=>(
+        renderItem={({ item, index }) => (
           <View>
-            <Image source={{uri:item?.imageUrl}}
-                style={styles?.sliderImage}
+            <Image source={{ uri: item?.imageUrl }}
+              style={styles?.sliderImage}
             />
           </View>
         )}
@@ -41,10 +41,10 @@ export default function Slider() {
 }
 
 const styles = StyleSheet.create({
-  sliderImage:{
-    width: Dimensions.get('screen').width*0.9,
-    height:180,
+  sliderImage: {
+    width: Dimensions.get('screen').width * 0.9,
+    height: 180,
     borderRadius: 15,
-    marginRight:15
+    marginRight: 15
   }
 })

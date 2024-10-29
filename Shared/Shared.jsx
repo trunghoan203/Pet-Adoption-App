@@ -1,30 +1,39 @@
-import { doc, getDoc, setDoc } from "firebase/firestore"
-import { db } from './../config/FirebaseConfig'
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db } from './../config/FirebaseConfig';
 
 export const GetFavList = async (user) => {
-    const docSnap = await getDoc(doc(db, 'UserFavPet', user?.primaryEmailAddress?.emailAddress));
-    if (docSnap?.exists()) {
+    if (!user) return null;
+
+    const userEmail = user.email;
+    const docRef = doc(db, 'UserFavPet', userEmail);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
         return docSnap.data();
     } else {
-        await setDoc(doc(db, 'UserFavPet', user?.primaryEmailAddress?.emailAddress))({
-            email: user?.primaryEmailAddress?.emailAddress,
+        // Create a new document with the user's email and an empty favorites array
+        await setDoc(docRef, {
+            email: userEmail,
             favorites: []
-        })
+        });
+        return { email: userEmail, favorites: [] }; // Return the newly created document data
     }
-}
+};
 
-const UpdateFav = async (user, favorites) => {
-    const docRef = doc(db, 'UserFavPet', user?.primaryEmailAddress?.emailAddress);
+export const UpdateFav = async (user, favorites) => {
+    if (!user) return;
+
+    const userEmail = user.email;
+    const docRef = doc(db, 'UserFavPet', userEmail);
+
     try {
-        await updateDoc(docRef, {
-            favorites: favorites
-        })
-    } catch (e) {
-
+        await updateDoc(docRef, { favorites });
+    } catch (error) {
+        console.error("Error updating favorites: ", error);
     }
-}
+};
 
 export default {
     GetFavList,
     UpdateFav
-}
+};
