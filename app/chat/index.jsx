@@ -3,14 +3,15 @@ import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/FirebaseConfig';
-import { useUser } from '@clerk/clerk-expo';
 import { GiftedChat } from 'react-native-gifted-chat'
 import moment from 'moment';
+import { getAuth } from "firebase/auth";
 
 export default function ChatScreen() {
     const params = useLocalSearchParams();
     const navigation = useNavigation();
-    const { user } = useUser();
+    const auth = getAuth();
+    const user = auth.currentUser;
     const [messages, setMessages] = useState([])
 
     useEffect(() => {

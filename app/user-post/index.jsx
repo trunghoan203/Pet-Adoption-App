@@ -1,16 +1,17 @@
 import { View, Text, FlatList, Pressable, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { db } from '../../config/FirebaseConfig';
-import { useUser } from '@clerk/clerk-expo';
 import { useNavigation } from '@react-navigation/native';
 import { query, collection, where, getDocs, deleteDoc } from 'firebase/firestore';
 import PetListItem from '../../components/Home/PetListItem';
 import { StyleSheet } from 'react-native';
 import Colors from '../../constants/Colors';
+import { getAuth } from "firebase/auth";
 
 export default function UserPost() {
     const navigation = useNavigation();
-    const { user } = useUser();
+    const auth = getAuth();
+    const user = auth.currentUser;
     const [loader, setLoader] = useState(false);
     const [userPostList, setUserPostList] = useState([]);
 

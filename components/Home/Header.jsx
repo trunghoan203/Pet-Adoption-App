@@ -1,10 +1,16 @@
-import { Text, View } from 'react-native'
-import React from 'react'
-import { useUser } from '@clerk/clerk-expo'
-import { Image } from 'react-native';
+import { Text, View, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { getAuth } from 'firebase/auth';
+import DefaultAvatar from '../../components/UserAvt/DefaultAvatar'; // Adjust path as necessary
 
 export default function Header() {
-    const { user } = useUser();
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const auth = getAuth();
+        setUser(auth.currentUser);
+    }, []);
+
     return (
         <View style={{
             display: 'flex',
@@ -20,15 +26,20 @@ export default function Header() {
                 <Text style={{
                     fontFamily: 'outfit-medium',
                     fontSize: 25,
-                }}>{user?.fullName}</Text>
+                }}>{user?.displayName || "User"}</Text>
             </View>
-            <Image source={{ uri: user?.imageUrl }}
-                style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 99
-                }} />
+            {user?.photoURL ? (
+                <Image
+                    source={{ uri: user.photoURL }}
+                    style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 99,
+                    }}
+                />
+            ) : (
+                <DefaultAvatar name={user?.displayName || "User"} size={40} />
+            )}
         </View>
-    )
-
+    );
 }

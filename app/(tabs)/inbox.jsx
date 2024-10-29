@@ -1,66 +1,76 @@
-import { View, Text, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { query } from 'firebase/database'
-import { collection, getDocs, where } from 'firebase/firestore'
-import { db } from '../../config/FirebaseConfig'
-import { useUser } from '@clerk/clerk-expo'
-import UserItem from '../../components/Inbox/UserItem'
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { query, collection, getDocs, where } from 'firebase/firestore';
+import { db } from '../../config/FirebaseConfig';
+import UserItem from '../../components/Inbox/UserItem';
+import { getAuth } from "firebase/auth";
 
 export default function Inbox() {
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-  const { user } = useUser();
   const [userList, setUserList] = useState([]);
   const [loader, setLoader] = useState(false);
-  useEffect(() => {
-    user && GetUserList();
-  }, [user])
+  const [otherUserList, setOtherUserList] = useState([]);
 
-  //Get User List Depends on Current User Emails
+  useEffect(() => {
+    if (user) {
+      GetUserList();
+    }
+  }, [user]);
+
+  // Get User List Depends on Current User Email
   const GetUserList = async () => {
     setLoader(true);
-    setUserList([])
-    const q = query(collection(db, 'Chat'), where('userIds', 'array-constains', user?.primaryEmailAddress?.emailAddress));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(doc => {
-      setUserList(prevList => [...prevList, doc.data()])
-
-    })
+    setUserList([]);
+    try {
+      const q = query(collection(db, 'Chat'), where('userIds', 'array-contains', user.email));
+      const querySnapshot = await getDocs(q);
+      const fetchedUsers = [];
+      querySnapshot.forEach(doc => {
+        fetchedUsers.push(doc.data());
+      });
+      setUserList(fetchedUsers);
+      MapOtherUserList(fetchedUsers); // Process other user list here
+    } catch (error) {
+      console.error("Error fetching user list: ", error);
+    }
     setLoader(false);
-  }
-  //Filter the list of Other User in on state
-  const MapOtherUserList = async () => {
-    const list = [];
-    userList.forEach((record) => {
-      const otherUser = record.users?.filter(user => user?.email != user?.primaryEmailAddress?.emailAddress);
-      const result = {
+  };
+
+  // Map the list to show the other user in the conversation
+  const MapOtherUserList = (userList) => {
+    const list = userList.map(record => {
+      const otherUser = record.users?.find(u => u.email !== user.email);
+      return {
         docId: record.id,
-        ...otherUser[0]
-      }
-      list.push(result)
-    })
-  }
+        ...otherUser,
+      };
+    });
+    setOtherUserList(list);
+  };
 
   return (
-    <View style={{
-      padding: 20,
-      marginTop: 20
-    }}>
-      <Text style={{
-        fontFamily: 'outfit-medium',
-        fontSize: 30
-      }}>Inbox</Text>
+    <View style={{ padding: 20, marginTop: 20 }}>
+      <Text style={{ fontFamily: 'outfit-medium', fontSize: 30 }}>Inbox</Text>
 
-      <FlatList
-        data={MapOtherUserList()}
-        refreshing={loader}
-        onRefresh={GetUserList}
-        style={{
-          marginTop: 20
-        }}
-        renderItem={({ item, index }) => (
-          <UserItem userInfo={item} key={index} />
-        )}
-      />
+      {loader ? (
+        <ActivityIndicator size="large" color="blue" />
+      ) : (
+        <FlatList
+          data={otherUserList}
+          keyExtractor={(item) => item.docId}
+          refreshing={loader}
+          onRefresh={GetUserList}
+          style={{ marginTop: 20 }}
+          renderItem={({ item }) => <UserItem userInfo={item} />}
+          ListEmptyComponent={
+            <Text style={{ fontFamily: 'outfit', fontSize: 20, textAlign: 'center' }}>
+              No conversations found.
+            </Text>
+          }
+        />
+      )}
     </View>
-  )
+  );
 }
