@@ -1,13 +1,36 @@
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/Home/Header';
 import Slider from '../../components/Home/Slider';
 import PetListCategory from '../../components/Home/PetListCategory';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Colors from '../../constants/Colors';
 import { Link } from 'expo-router';
+import { auth, db } from '../../config/FirebaseConfig'; // Ensure db and auth are correctly imported from FirebaseConfig
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function Home() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = await getDoc(doc(db, "User", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setIsAdmin(userData.isAdmin === 1); // Set to true if isAdmin is 1
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user role: ", error);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
   const renderHeader = () => (
     <View>
       <Header />
@@ -24,10 +47,12 @@ export default function Home() {
         renderItem={null}
         keyExtractor={(item, index) => index.toString()}
         ListFooterComponent={
-          <Link href={'/add-new-pet'} style={styles.addNewPetContainer}>
-            <MaterialIcons name="pets" size={24} color={Colors.PRIMARY} />
-            <Text style={styles.addNewPetText}>Add New Pet</Text>
-          </Link>
+          isAdmin && ( // Conditionally render this link if the user is an admin
+            <Link href={'/add-new-pet'} style={styles.addNewPetContainer}>
+              <MaterialIcons name="pets" size={24} color={Colors.PRIMARY} />
+              <Text style={styles.addNewPetText}>Add New Pet</Text>
+            </Link>
+          )
         }
       />
     </View>

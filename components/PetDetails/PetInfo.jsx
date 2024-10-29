@@ -10,8 +10,8 @@ export default function PetInfo({ pet }) {
         style={{
           width: '100%',
           height: 400,
-          objectFit: 'cover'
-
+          objectFit: 'cover',
+          marginTop: 10
         }}
       />
       <View style={{
