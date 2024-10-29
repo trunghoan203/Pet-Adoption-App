@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, Image, StyleSheet } from 'react-native';
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -42,64 +42,100 @@ export default function Profile() {
   };
 
   const Menu = [
-    { id: 1, name: 'Add New Pet', icon: 'add-circle', path: '/add-new-pet' },
-    { id: 5, name: 'My Post', icon: 'bookmark', path: '/../user-post' },
+    { id: 1, name: 'Change Password', icon: 'bookmark', path: '/../changepassword' },
     { id: 2, name: 'Favorites', icon: 'heart', path: '/(tabs)/favorite' },
-    { id: 3, name: 'Inbox', icon: 'chatbubble-ellipses', path: '/(tabs)/inbox' },
+    { id: 3, name: 'Order', icon: 'chatbubble-ellipses', path: '/(tabs)/order' },
     { id: 4, name: 'Logout', icon: 'exit' },
   ];
 
-  return (
-    <View style={{ padding: 10, marginTop: 10 }}>
-      <Text style={{ fontFamily: 'outfit-medium', fontSize: 30 }}>Profile</Text>
-      <View style={{ display: 'flex', alignItems: 'center', marginVertical: 15 }}>
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <Text style={styles.headerText}>Profile</Text>
+      <View style={styles.profileInfo}>
         {user?.photoURL ? (
           <Image
             source={{ uri: user.photoURL }}
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: 99
-            }}
+            style={styles.avatar}
           />
         ) : (
           <DefaultAvatar name={user?.displayName || "User"} size={70} />
         )}
-        <Text style={{ fontFamily: 'outfit-bold', fontSize: 20 }}>{user?.displayName || "User"}</Text>
-        <Text style={{ fontFamily: 'outfit', fontSize: 15, color: Colors.GRAY }}>{user?.email}</Text>
+        <Text style={styles.displayName}>{user?.displayName || "User"}</Text>
+        <Text style={styles.email}>{user?.email}</Text>
       </View>
-
-      <FlatList
-        data={Menu}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => onPressMenu(item)}
-            style={{
-              marginVertical: 10,
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 10,
-              backgroundColor: Colors.WHITE,
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <Ionicons
-              name={item.icon}
-              size={30}
-              color={Colors.PRIMARY}
-              style={{
-                padding: 10,
-                backgroundColor: Colors.LIGHT_PRIMARY,
-                borderRadius: 8,
-              }}
-            />
-            <Text style={{ fontFamily: 'outfit', fontSize: 20 }}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
     </View>
   );
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => onPressMenu(item)}
+      style={styles.menuItem}
+    >
+      <Ionicons
+        name={item.icon}
+        size={30}
+        color={Colors.PRIMARY}
+        style={styles.icon}
+      />
+      <Text style={styles.menuText}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <FlatList
+      data={Menu}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={renderItem}
+      ListHeaderComponent={renderHeader}
+      contentContainerStyle={{ padding: 10, paddingBottom: 30 }}
+    />
+  );
 }
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    marginTop: 10,
+  },
+  headerText: {
+    fontFamily: 'outfit-medium',
+    fontSize: 30,
+  },
+  profileInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    marginVertical: 15,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 99,
+  },
+  displayName: {
+    fontFamily: 'outfit-bold',
+    fontSize: 20,
+  },
+  email: {
+    fontFamily: 'outfit',
+    fontSize: 15,
+    color: Colors.GRAY,
+  },
+  menuItem: {
+    marginVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.WHITE,
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10
+  },
+  icon: {
+    padding: 10,
+    backgroundColor: Colors.LIGHT_PRIMARY,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  menuText: {
+    fontFamily: 'outfit',
+    fontSize: 20,
+  },
+});
