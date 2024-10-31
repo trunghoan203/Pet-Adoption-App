@@ -22,11 +22,7 @@ export default function SignIn() {
     const onSignIn = () => {
         if (!email || !password) {
             const message = 'Please enter all details';
-            if (Platform.OS === 'android') {
-                ToastAndroid.show(message, ToastAndroid.LONG);
-            } else {
-                Alert.alert('Error', message);
-            }
+            Platform.OS === 'android' ? ToastAndroid.show(message, ToastAndroid.LONG) : Alert.alert('Error', message);
             return;
         }
 
@@ -39,14 +35,22 @@ export default function SignIn() {
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     if (userData.isAdmin === 1) {
-                        router.replace('/admin/dashboard'); // Redirect to Dashboard for Admin
+                        router.replace('/home'); // Redirect to Dashboard for Admin
                     } else {
                         router.replace('/home'); // Redirect to Home for regular users
                     }
                 }
             })
             .catch((error) => {
-                const errorMessage = error.message;
+                let errorMessage;
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'Wrong email!!!';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Wrong Password!!!';
+                } else {
+                    errorMessage = error.message;
+                }
+
                 if (Platform.OS === 'android') {
                     ToastAndroid.show(errorMessage, ToastAndroid.LONG);
                 } else {
@@ -55,9 +59,17 @@ export default function SignIn() {
             });
     };
 
+    const handleGoBack = () => {
+        if (navigation.canGoBack()) {
+            navigation.goBack(); // Only go back if there's a previous screen
+        } else {
+            router.replace('/'); // Redirect to a default route if there’s no back history
+        }
+    };
+
     return (
         <View style={styles.container}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={handleGoBack}>
                 <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             <Text style={styles.title}>Let's Sign You In</Text>

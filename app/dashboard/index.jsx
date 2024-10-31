@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Image, FlatList } from 'react-native';
 import { db } from '../../config/FirebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Colors from '../../constants/Colors';
 
 export default function Dashboard() {
-    const [petsByCategory, setPetsByCategory] = useState([]);
-    const [totalUsers, setTotalUsers] = useState(0);
-    const [totalAdoptedPets, setTotalAdoptedPets] = useState(0);
+    const [dashboardData, setDashboardData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [categoryAvatars, setCategoryAvatars] = useState({});
 
@@ -39,13 +37,22 @@ export default function Dashboard() {
                     categoryCounts[category] = (categoryCounts[category] || 0) + 1;
                 });
 
-                setPetsByCategory(Object.entries(categoryCounts).map(([category, count]) => ({ category, count })));
-                setTotalAdoptedPets(adoptedCount);
+                // Prepare data for display
+                const categoriesData = Object.entries(categoryCounts).map(([category, count]) => ({
+                    type: 'category',
+                    category,
+                    count,
+                    avatar: avatars[category] || 'https://via.placeholder.com/50',
+                }));
+                const userData = [];
 
                 // Query total number of users excluding admins
                 const usersQuery = query(collection(db, 'User'), where('isUser', '==', 1));
                 const usersSnapshot = await getDocs(usersQuery);
-                setTotalUsers(usersSnapshot.size);
+                userData.push({ type: 'stat', title: 'Total Users', value: usersSnapshot.size });
+                userData.push({ type: 'stat', title: 'Total Adopted Pets', value: adoptedCount });
+
+                setDashboardData([...userData, ...categoriesData]);
 
             } catch (error) {
                 console.error("Error fetching statistics: ", error);
@@ -65,33 +72,40 @@ export default function Dashboard() {
         );
     }
 
+    const renderItem = ({ item }) => {
+        if (item.type === 'stat') {
+            return (
+                <View style={styles.statBox}>
+                    <Text style={styles.statText}>{item.title}</Text>
+                    <Text style={styles.statNumber}>{item.value}</Text>
+                </View>
+            );
+        } else if (item.type === 'category') {
+            return (
+                <View style={styles.categoryBox}>
+                    <Image
+                        source={{ uri: item.avatar }}
+                        style={styles.categoryAvatar}
+                    />
+                    <Text style={styles.categoryText}>{item.category}</Text>
+                    <Text style={styles.categoryCount}>{item.count}</Text>
+                </View>
+            );
+        }
+        return null;
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.header}>Admin Dashboard</Text>
-            <View style={styles.statRow}>
-                <View style={styles.statBox}>
-                    <Text style={styles.statText}>Total Users</Text>
-                    <Text style={styles.statNumber}>{totalUsers}</Text>
-                </View>
-                <View style={styles.statBox}>
-                    <Text style={styles.statText}>Total Adopted Pets</Text>
-                    <Text style={styles.statNumber}>{totalAdoptedPets}</Text>
-                </View>
-            </View>
-
-            <Text style={styles.sectionHeader}>Pets Available by Category:</Text>
-            <View style={styles.categoryGrid}>
-                {petsByCategory.map((item, index) => (
-                    <View key={index} style={styles.categoryBox}>
-                        <Image
-                            source={{ uri: categoryAvatars[item.category] || 'https://via.placeholder.com/50' }}
-                            style={styles.categoryAvatar}
-                        />
-                        <Text style={styles.categoryText}>{item.category}</Text>
-                        <Text style={styles.categoryCount}>{item.count}</Text>
-                    </View>
-                ))}
-            </View>
+            <FlatList
+                data={dashboardData}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                numColumns={2}
+                columnWrapperStyle={styles.row}
+                contentContainerStyle={styles.contentContainer}
+            />
         </View>
     );
 }
@@ -114,10 +128,12 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
     },
-    statRow: {
-        flexDirection: 'row',
+    contentContainer: {
+        paddingBottom: 20,
+    },
+    row: {
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 15,
     },
     statBox: {
         flex: 1,
@@ -138,22 +154,9 @@ const styles = StyleSheet.create({
         color: Colors.PRIMARY,
         marginTop: 5,
     },
-    sectionHeader: {
-        fontSize: 20,
-        fontFamily: 'outfit-bold',
-        color: Colors.GRAY,
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    categoryGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-    },
     categoryBox: {
         width: '48%',
         backgroundColor: Colors.LIGHT_PRIMARY,
-        marginBottom: 15,
         paddingVertical: 20,
         borderRadius: 10,
         alignItems: 'center',

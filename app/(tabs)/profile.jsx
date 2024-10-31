@@ -43,7 +43,7 @@ export default function Profile() {
 
   const Menu = [
     { id: 1, name: 'Change Password', icon: 'bookmark', path: '/../changepassword' },
-    { id: 2, name: 'Favorites', icon: 'heart', path: '/(tabs)/favorite' },
+    { id: 2, name: 'Dashboard', icon: 'bar-chart', path: '/(tabs)/home' },
     { id: 3, name: 'Order', icon: 'chatbubble-ellipses', path: '/(tabs)/order' },
     { id: 4, name: 'Logout', icon: 'exit' },
   ];
