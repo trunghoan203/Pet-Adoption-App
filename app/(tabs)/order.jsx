@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: Colors.PRIMARY,
     textAlign: 'center',
+    marginTop: 20,
   },
   orderItem: {
     flexDirection: 'row',

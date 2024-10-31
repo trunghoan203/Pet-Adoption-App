@@ -1,42 +1,68 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Colors from './../../constants/Colors'
+import Colors from './../../constants/Colors';
+import { getAuth } from 'firebase/auth';
+import { db } from '../../config/FirebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+
 export default function TabLayout() {
+    const [isAdmin, setIsAdmin] = useState(false);
+    const auth = getAuth();
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = await getDoc(doc(db, 'User', user.uid));
+                if (userDoc.exists() && userDoc.data().isAdmin === 1) {
+                    setIsAdmin(true);
+                }
+            }
+        };
+        fetchUserRole();
+    }, []);
+
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor: Colors.PRIMARY
+                tabBarActiveTintColor: Colors.PRIMARY,
             }}
         >
-            <Tabs.Screen name='home'
+            <Tabs.Screen
+                name={isAdmin ? 'home' : 'home'}
                 options={{
-                    title: 'Home',
-                    headerShow: false,
-                    tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />
+                    title: isAdmin ? 'Dashboard' : 'Home',
+                    headerShown: false,
+                    tabBarIcon: ({ color }) =>
+                        <Ionicons name={isAdmin ? "speedometer" : "home"} size={24} color={color} />,
                 }}
             />
-            <Tabs.Screen name='favorite'
+            <Tabs.Screen
+                name={isAdmin ? 'favorite' : 'favorite'}
                 options={{
-                    title: 'Favorite',
-                    headerShow: false,
-                    tabBarIcon: ({ color }) => <Ionicons name="heart-circle" size={24} color={color} />
+                    title: isAdmin ? 'Add New Pet' : 'Favorite',
+                    headerShown: false,
+                    tabBarIcon: ({ color }) =>
+                        <Ionicons name={isAdmin ? "add-circle" : "heart-circle"} size={24} color={color} />,
                 }}
             />
-            <Tabs.Screen name='order'
+            <Tabs.Screen
+                name="order"
                 options={{
                     title: 'Order',
-                    headerShow: false,
-                    tabBarIcon: ({ color }) => <Ionicons name="archive-sharp" size={24} color={color} />
+                    headerShown: false,
+                    tabBarIcon: ({ color }) => <Ionicons name="archive-sharp" size={24} color={color} />,
                 }}
             />
-            <Tabs.Screen name='profile'
+            <Tabs.Screen
+                name="profile"
                 options={{
                     title: 'Profile',
-                    headerShow: false,
-                    tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />
+                    headerShown: false,
+                    tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />,
                 }}
             />
         </Tabs>
-    )
+    );
 }
