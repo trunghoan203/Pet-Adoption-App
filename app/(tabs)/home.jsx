@@ -119,7 +119,7 @@ export default function Home() {
           <Text style={styles.statNumber}>{dashboardData.totalUsers}</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statText}>Total Adopted Pets</Text>
+          <Text style={styles.statText}>Total Adoptions</Text>
           <Text style={styles.statNumber}>{dashboardData.totalAdoptedPets}</Text>
         </View>
       </View>
@@ -144,17 +144,17 @@ export default function Home() {
     <View style={styles.container}>
       <FlatList
         ListHeaderComponent={isAdmin ? renderDashboard : renderHeader}
-        data={[]} // Empty data as the main content is in the header and footer
+        data={[]}
         renderItem={null}
         keyExtractor={(item, index) => index.toString()}
-        ListFooterComponent={
-          isAdmin ? null : (
-            <Link href={'/add-new-pet'} style={styles.addNewPetContainer}>
-              <MaterialIcons name="pets" size={24} color={Colors.PRIMARY} />
-              <Text style={styles.addNewPetText}>Add New Pet</Text>
-            </Link>
-          )
-        }
+      // ListFooterComponent={
+      //   isAdmin ? null : (
+      //     <Link href={'/add-new-pet'} style={styles.addNewPetContainer}>
+      //       <MaterialIcons name="pets" size={24} color={Colors.PRIMARY} />
+      //       <Text style={styles.addNewPetText}>Add New Pet</Text>
+      //     </Link>
+      //   )
+      // }
       />
     </View>
   );

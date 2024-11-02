@@ -1,6 +1,6 @@
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
-import Colors from '../constants/Colors';
+import Colors from '../../constants/Colors';
 import { useRouter } from 'expo-router';
 
 export default function Login() {
@@ -13,7 +13,7 @@ export default function Login() {
     const renderItem = () => (
         <View>
             <Image
-                source={require('../assets/images/login.png')}
+                source={require('../../assets/images/login.png')}
                 style={{
                     width: '100%',
                     height: 450

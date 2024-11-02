@@ -12,7 +12,7 @@ export default function Profile() {
   const user = auth.currentUser;
 
   const onPressMenu = (menu) => {
-    if (menu.id === 4) {
+    if (menu.id === 3) {
       handleLogout();
     } else {
       router.push(menu.path);
@@ -43,9 +43,8 @@ export default function Profile() {
 
   const Menu = [
     { id: 1, name: 'Change Password', icon: 'bookmark', path: '/../changepassword' },
-    { id: 2, name: 'Dashboard', icon: 'bar-chart', path: '/(tabs)/home' },
-    { id: 3, name: 'Order', icon: 'chatbubble-ellipses', path: '/(tabs)/order' },
-    { id: 4, name: 'Logout', icon: 'exit' },
+    { id: 2, name: 'Profile Detail', icon: 'pricetag', path: '/../changepassword' },
+    { id: 3, name: 'Logout', icon: 'exit' },
   ];
 
   const renderHeader = () => (

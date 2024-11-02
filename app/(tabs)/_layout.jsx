@@ -24,29 +24,30 @@ export default function TabLayout() {
     }, []);
 
     return (
-        <Tabs
-            screenOptions={{
-                tabBarActiveTintColor: Colors.PRIMARY,
-            }}
-        >
+        <Tabs screenOptions={{
+            tabBarActiveTintColor: Colors.PRIMARY,
+        }}>
+
             <Tabs.Screen
                 name={isAdmin ? 'home' : 'home'}
                 options={{
                     title: isAdmin ? 'Dashboard' : 'Home',
                     headerShown: false,
                     tabBarIcon: ({ color }) =>
-                        <Ionicons name={isAdmin ? "speedometer" : "home"} size={24} color={color} />,
+                        <Ionicons name={isAdmin ? "bar-chart" : "home"} size={24} color={color} />,
                 }}
             />
+
             <Tabs.Screen
-                name={isAdmin ? 'favorite' : 'favorite'}
+                name='favorite'
                 options={{
-                    title: isAdmin ? 'Add New Pet' : 'Favorite',
+                    title: 'Favorite',
                     headerShown: false,
                     tabBarIcon: ({ color }) =>
-                        <Ionicons name={isAdmin ? "add-circle" : "heart-circle"} size={24} color={color} />,
+                        <Ionicons name="heart-circle" size={24} color={color} />,
                 }}
             />
+
             <Tabs.Screen
                 name="order"
                 options={{
@@ -55,6 +56,17 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <Ionicons name="archive-sharp" size={24} color={color} />,
                 }}
             />
+
+            <Tabs.Screen
+                name="managepet"
+                options={{
+                    title: 'Manage Pet',
+                    headerShown: false,
+                    tabBarIcon: ({ color }) =>
+                        <Ionicons name="cog-sharp" size={24} color={color} />,
+                }}
+            />
+
             <Tabs.Screen
                 name="profile"
                 options={{
@@ -63,6 +75,7 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />,
                 }}
             />
+
         </Tabs>
     );
 }
