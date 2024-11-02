@@ -22,7 +22,7 @@ export default function ManagePet() {
                     const userData = userDoc.data();
                     if (userData.isAdmin !== 1) {
                         Alert.alert("Access Denied", "Only Admins can access this page.");
-                        router.replace("/home");  // Navigate back to the home screen or any other screen
+                        router.replace("/home");
                     } else {
                         fetchAllPets();
                     }
@@ -84,7 +84,11 @@ export default function ManagePet() {
                     <Text style={styles.loadingText}>Loading pets...</Text>
                 ) : (
                     petList.map(pet => (
-                        <View key={pet.id} style={styles.petCard}>
+                        <TouchableOpacity
+                            key={pet.id}
+                            style={styles.petCard}
+                            onPress={() => router.push({ pathname: '/pet-details', params: { id: pet.id } })}
+                        >
                             <Image source={{ uri: pet.imageUrl }} style={styles.petImage} />
                             <View style={styles.petDetails}>
                                 <Text style={styles.petName}>{pet.name}</Text>
@@ -101,7 +105,7 @@ export default function ManagePet() {
                                     <Text style={styles.deleteButtonText}>Delete</Text>
                                 </TouchableOpacity>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     ))
                 )}
             </ScrollView>

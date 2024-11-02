@@ -11,19 +11,24 @@ export default function Order() {
   const [isAdmin, setIsAdmin] = useState(false);
   const user = auth.currentUser;
 
+  // Fetch user role to check if the user is an admin
   const fetchUserRole = async () => {
     try {
       const userDoc = await getDoc(doc(db, 'User', user.uid));
-      setIsAdmin(userDoc.exists && userDoc.data().isAdmin === 1);
+      const isAdminRole = userDoc.exists && userDoc.data().isAdmin === 1;
+      setIsAdmin(isAdminRole);
+      console.log("User is admin:", isAdminRole);
+      return isAdminRole;
     } catch (error) {
-      console.error("Error checking user role: ", error);
+      console.error("Error checking user role:", error);
+      return false;
     }
   };
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (adminStatus) => {
     try {
       setLoading(true);
-      const q = isAdmin
+      const q = adminStatus
         ? collection(db, 'AdoptionRequests') // Fetch all requests if Admin
         : query(collection(db, 'AdoptionRequests'), where('userId', '==', user.uid));
 
@@ -33,8 +38,9 @@ export default function Order() {
         ...doc.data(),
       }));
       setOrders(ordersData);
+      console.log("Fetched orders:", ordersData);
     } catch (error) {
-      console.error('Error fetching orders: ', error);
+      console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -42,13 +48,18 @@ export default function Order() {
   };
 
   useEffect(() => {
-    fetchUserRole();
-    fetchOrders();
+    // Fetch user role first, then fetch orders based on role
+    const initializeOrders = async () => {
+      const adminStatus = await fetchUserRole();
+      await fetchOrders(adminStatus);
+    };
+
+    initializeOrders();
   }, [user.uid]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchOrders();
+    fetchOrders(isAdmin);
   };
 
   const handleConfirm = async (requestId, petId, adoptionData) => {
@@ -69,9 +80,9 @@ export default function Order() {
       });
 
       Alert.alert('Success', 'Request confirmed and pet updated.');
-      fetchOrders();
+      fetchOrders(isAdmin);  // Refresh orders after confirmation
     } catch (error) {
-      console.error("Error confirming request: ", error);
+      console.error("Error confirming request:", error);
       Alert.alert('Error', 'Failed to confirm request.');
     }
   };
@@ -83,9 +94,9 @@ export default function Order() {
       });
 
       Alert.alert('Rejected', 'Request has been rejected.');
-      fetchOrders();
+      fetchOrders(isAdmin);  // Refresh orders after rejection
     } catch (error) {
-      console.error("Error rejecting request: ", error);
+      console.error("Error rejecting request:", error);
       Alert.alert('Error', 'Failed to reject request.');
     }
   };
@@ -125,7 +136,7 @@ export default function Order() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Your Adoption Requests</Text>
+      <Text style={styles.header}>Adoption Requests</Text>
       {loading ? (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color={Colors.PRIMARY} />

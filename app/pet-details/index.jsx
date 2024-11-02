@@ -20,7 +20,7 @@ export default function PetDetails() {
   const handleAdoptMe = () => {
     router.push({
       pathname: 'pet-details/request',
-      params: { petId: pet.id }, // Assuming pet.id is available
+      params: { petId: pet.id },
     });
   };
 

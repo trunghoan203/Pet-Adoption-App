@@ -31,7 +31,7 @@ export default function Profile() {
         onPress: () => {
           signOut(auth)
             .then(() => {
-              router.replace('/');
+              router.push('/');
             })
             .catch(error => {
               console.error("Logout failed: ", error);
