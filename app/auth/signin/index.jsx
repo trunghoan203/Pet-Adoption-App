@@ -73,13 +73,13 @@ export default function SignIn() {
                 <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             <Text style={styles.title}>Let's Sign You In</Text>
-            <Text style={styles.subtitle}>Welcome Back</Text>
 
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Email</Text>
                 <TextInput
                     style={styles.input}
                     placeholder='Enter Email'
+                    placeholderTextColor={Colors.GRAY}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     value={email}
@@ -93,6 +93,7 @@ export default function SignIn() {
                     secureTextEntry
                     style={styles.input}
                     placeholder='Enter Password'
+                    placeholderTextColor={Colors.GRAY}
                     value={password}
                     onChangeText={setPassword}
                 />

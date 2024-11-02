@@ -68,6 +68,7 @@ export default function SignUp() {
                 <TextInput
                     style={styles.input}
                     placeholder='Enter Full Name'
+                    placeholderTextColor={Colors.GRAY}
                     value={fullName}
                     onChangeText={setFullName}
                 />
@@ -78,6 +79,7 @@ export default function SignUp() {
                 <TextInput
                     style={styles.input}
                     placeholder='Enter Email'
+                    placeholderTextColor={Colors.GRAY}
                     keyboardType='email-address'
                     value={email}
                     onChangeText={setEmail}
@@ -90,6 +92,7 @@ export default function SignUp() {
                 <TextInput
                     style={styles.input}
                     placeholder='Enter Password'
+                    placeholderTextColor={Colors.GRAY}
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
