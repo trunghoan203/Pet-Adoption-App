@@ -76,7 +76,6 @@ export default function AddNewPet() {
             console.log('Fire Upload');
         }).then(resp => {
             getDownloadURL(storageRef).then(async (downloadUrl) => {
-                console.log(downloadUrl);
                 SaveFormData(downloadUrl);
             });
         });
@@ -87,8 +86,8 @@ export default function AddNewPet() {
         await setDoc(doc(db, 'Pets', docId), {
             ...formData,
             imageUrl: imageUrl,
-            username: user?.displayName,
-            email: user?.email,
+            adminName: user?.displayName,
+            adminEmail: user?.email,
             userImage: user?.photoURL,
             id: docId
         });

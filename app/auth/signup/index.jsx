@@ -41,7 +41,7 @@ export default function SignUp() {
                 isUser: 1,
             });
 
-            router.replace('/home'); // Navigate to Home screen after account creation
+            router.replace('/auth/signin');
         } catch (error) {
             const errorMessage = error.message;
             Platform.OS === 'android' ? ToastAndroid.show(errorMessage, ToastAndroid.LONG) : Alert.alert('Sign-Up Error', errorMessage);

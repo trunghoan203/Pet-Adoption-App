@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Image, RefreshControl } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Home/Header';
 import Slider from '../../components/Home/Slider';
@@ -12,6 +12,7 @@ import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firesto
 export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [dashboardData, setDashboardData] = useState({
     petsByCategory: [],
     totalUsers: 0,
@@ -47,7 +48,6 @@ export default function Home() {
     try {
       setLoading(true);
 
-      // Fetch category avatars from the Category collection
       const categorySnapshot = await getDocs(collection(db, 'Category'));
       const avatars = {};
       categorySnapshot.forEach(doc => {
@@ -55,27 +55,29 @@ export default function Home() {
         avatars[data.name] = data.imageUrl;
       });
 
-      // Get total number of pets by category and adopted count
+      const adoptionsSnapshot = await getDocs(collection(db, 'AdoptionRequests'));
+      let adoptedCount = 0;
+      adoptionsSnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.status === 'Done') {
+          adoptedCount++;
+        }
+      });
+
       const petsSnapshot = await getDocs(collection(db, 'Pets'));
       const categoryCounts = {};
-      let adoptedCount = 0;
-
       petsSnapshot.forEach(doc => {
         const data = doc.data();
         const category = data.category;
-        if (data.status === 'Adopted') {
-          adoptedCount++;
-        }
         categoryCounts[category] = (categoryCounts[category] || 0) + 1;
       });
 
       const petsByCategory = Object.entries(categoryCounts).map(([category, count]) => ({
         category,
         count,
-        avatar: avatars[category] || 'https://via.placeholder.com/50'
+        avatar: avatars[category] || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_s20LqMdVS2zi4wj74utMxoFwdo2uNUzqPA&s'
       }));
 
-      // Query total number of users excluding admins
       const usersQuery = query(collection(db, 'User'), where('isUser', '==', 1));
       const usersSnapshot = await getDocs(usersQuery);
       const totalUsers = usersSnapshot.size;
@@ -91,10 +93,16 @@ export default function Home() {
       console.error("Error fetching dashboard data: ", error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  if (loading) {
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchDashboardData();
+  };
+
+  if (loading && !refreshing) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color={Colors.PRIMARY} />
@@ -119,7 +127,7 @@ export default function Home() {
           <Text style={styles.statNumber}>{dashboardData.totalUsers}</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statText}>Total Adoptions</Text>
+          <Text style={styles.statText}>Total Adopted</Text>
           <Text style={styles.statNumber}>{dashboardData.totalAdoptedPets}</Text>
         </View>
       </View>
@@ -147,14 +155,9 @@ export default function Home() {
         data={[]}
         renderItem={null}
         keyExtractor={(item, index) => index.toString()}
-      // ListFooterComponent={
-      //   isAdmin ? null : (
-      //     <Link href={'/add-new-pet'} style={styles.addNewPetContainer}>
-      //       <MaterialIcons name="pets" size={24} color={Colors.PRIMARY} />
-      //       <Text style={styles.addNewPetText}>Add New Pet</Text>
-      //     </Link>
-      //   )
-      // }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );
@@ -164,7 +167,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    marginTop: 0,
+    marginTop: 20,
   },
   loaderContainer: {
     flex: 1,

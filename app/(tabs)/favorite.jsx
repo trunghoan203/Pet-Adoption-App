@@ -5,6 +5,7 @@ import { db } from '../../config/FirebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import PetListItem from '../../components/Home/PetListItem';
 import { getAuth } from "firebase/auth";
+import Colors from '../../constants/Colors';
 
 export default function Favorite() {
   const auth = getAuth();
@@ -70,8 +71,15 @@ export default function Favorite() {
   };
 
   return (
-    <View style={{ flex: 1, padding: 10, marginTop: 20 }}>
-      <Text style={{ fontFamily: 'outfit-medium', fontSize: 30 }}>Favorite</Text>
+    <View style={{ flex: 1, padding: 10, marginTop: 30 }}>
+      <Text style={{
+        fontSize: 24,
+        fontFamily: 'outfit-bold',
+        color: Colors.PRIMARY,
+        marginBottom: 20,
+        textAlign: 'center',
+        marginTop: 20
+      }}>Favorite</Text>
 
       {loader ? (
         <ActivityIndicator size="large" color="blue" />
