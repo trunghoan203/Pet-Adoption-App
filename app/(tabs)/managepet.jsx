@@ -10,6 +10,7 @@ import { getAuth } from "firebase/auth";
 export default function ManagePet() {
     const [petList, setPetList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false); // State to track admin access
     const router = useRouter();
     const auth = getAuth();
     const user = auth.currentUser;
@@ -20,11 +21,11 @@ export default function ManagePet() {
                 const userDoc = await getDoc(doc(db, "User", user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    if (userData.isAdmin !== 1) {
-                        Alert.alert("Access Denied", "Only Admins can access this page.");
-                        // router.replace("/home");
-                    } else {
+                    setIsAdmin(userData.isAdmin === 1); // Set isAdmin based on user role
+                    if (userData.isAdmin === 1) {
                         fetchAllPets();
+                    } else {
+                        Alert.alert("Access Denied", "Only Admins can access this page.");
                     }
                 }
             } catch (error) {
@@ -73,10 +74,12 @@ export default function ManagePet() {
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.headerText}>Manage Pets</Text>
-                <TouchableOpacity onPress={() => router.push('/add-new-pet')} style={styles.addButton}>
-                    <Ionicons name="add-circle" size={24} color={Colors.WHITE} />
-                    <Text style={styles.addButtonText}>Add Pet</Text>
-                </TouchableOpacity>
+                {isAdmin && (
+                    <TouchableOpacity onPress={() => router.push('/add-new-pet')} style={styles.addButton}>
+                        <Ionicons name="add-circle" size={24} color={Colors.WHITE} />
+                        <Text style={styles.addButtonText}>Add Pet</Text>
+                    </TouchableOpacity>
+                )}
             </View>
 
             <ScrollView contentContainerStyle={styles.petListContainer}>
@@ -95,16 +98,18 @@ export default function ManagePet() {
                                 <Text style={styles.petCategory}>{pet.category}</Text>
                                 <Text style={styles.petCategory}>{pet.userName}</Text>
                             </View>
-                            <View style={styles.actionButtons}>
-                                <TouchableOpacity onPress={() => router.push({ pathname: '/edit-pet', params: { id: pet.id } })} style={styles.editButton}>
-                                    <Ionicons name="pencil" size={20} color={Colors.WHITE} />
-                                    <Text style={styles.editButtonText}>Edit</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => confirmDelete(pet.id)} style={styles.deleteButton}>
-                                    <Ionicons name="trash" size={20} color={Colors.WHITE} />
-                                    <Text style={styles.deleteButtonText}>Delete</Text>
-                                </TouchableOpacity>
-                            </View>
+                            {isAdmin && (
+                                <View style={styles.actionButtons}>
+                                    <TouchableOpacity onPress={() => router.push({ pathname: '/edit-pet', params: { id: pet.id } })} style={styles.editButton}>
+                                        <Ionicons name="pencil" size={20} color={Colors.WHITE} />
+                                        <Text style={styles.editButtonText}>Edit</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => confirmDelete(pet.id)} style={styles.deleteButton}>
+                                        <Ionicons name="trash" size={20} color={Colors.WHITE} />
+                                        <Text style={styles.deleteButtonText}>Delete</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
                         </TouchableOpacity>
                     ))
                 )}

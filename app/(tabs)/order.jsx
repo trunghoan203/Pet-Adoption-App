@@ -1,7 +1,7 @@
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, Image, RefreshControl, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../config/FirebaseConfig';
-import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import Colors from '../../constants/Colors';
 
 export default function Order() {
@@ -17,7 +17,6 @@ export default function Order() {
       const userDoc = await getDoc(doc(db, 'User', user.uid));
       const isAdminRole = userDoc.exists && userDoc.data().isAdmin === 1;
       setIsAdmin(isAdminRole);
-      console.log("User is admin:", isAdminRole);
       return isAdminRole;
     } catch (error) {
       console.error("Error checking user role:", error);
@@ -38,7 +37,6 @@ export default function Order() {
         ...doc.data(),
       }));
       setOrders(ordersData);
-      console.log("Fetched orders:", ordersData);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
@@ -48,12 +46,10 @@ export default function Order() {
   };
 
   useEffect(() => {
-    // Fetch user role first, then fetch orders based on role
     const initializeOrders = async () => {
       const adminStatus = await fetchUserRole();
       await fetchOrders(adminStatus);
     };
-
     initializeOrders();
   }, [user.uid]);
 
@@ -101,6 +97,43 @@ export default function Order() {
     }
   };
 
+  const handleCancel = async (requestId) => {
+    try {
+      await updateDoc(doc(db, 'AdoptionRequests', requestId), {
+        status: 'Cancelled'
+      });
+      Alert.alert('Cancelled', 'Your request has been cancelled.');
+      fetchOrders(isAdmin); // Refresh orders after cancellation
+    } catch (error) {
+      console.error("Error cancelling request:", error);
+      Alert.alert('Error', 'Failed to cancel the request.');
+    }
+  };
+
+  const handleDelete = async (requestId) => {
+    Alert.alert(
+      "Delete Request",
+      "Are you sure you want to delete this request?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, 'AdoptionRequests', requestId));
+              Alert.alert('Deleted', 'Request has been deleted.');
+              fetchOrders(isAdmin); // Refresh orders after deletion
+            } catch (error) {
+              console.error("Error deleting request:", error);
+              Alert.alert('Error', 'Failed to delete request.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'Done':
@@ -109,6 +142,8 @@ export default function Order() {
         return Colors.PRIMARY;
       case 'Reject':
         return Colors.RED;
+      case 'Cancelled':
+        return Colors.GRAY;
       default:
         return Colors.GRAY;
     }
@@ -122,33 +157,52 @@ export default function Order() {
       />
       <View style={styles.orderTextContainer}>
         <Text style={styles.orderText}>Full Name: {item.fullName}</Text>
+        <Text style={styles.orderText}>Pet Name: {item.petName}</Text>
         <Text style={styles.orderText}>Phone: {item.phone}</Text>
         <Text style={styles.orderText}>Email: {item.email}</Text>
-        <Text style={styles.orderText}>Status:
+        <Text style={styles.orderText}>
+          Status:
           <Text style={{ color: getStatusColor(item.status) }}> {item.status}</Text>
         </Text>
         <Text style={styles.orderText}>Request Date: {item.requestDate.toDate().toLocaleDateString()}</Text>
       </View>
 
-      {isAdmin && item.status !== 'Done' && item.status !== 'Reject' && (
-        <View style={styles.adminActions}>
+      <View style={styles.actions}>
+        {isAdmin && item.status === 'Pending' && (
+          <>
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={() => handleConfirm(item.id, item.petId, item)}
+            >
+              <Text style={styles.buttonText}>Confirm</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.rejectButton}
+              onPress={() => handleReject(item.id)}
+            >
+              <Text style={styles.buttonText}>Reject</Text>
+            </TouchableOpacity>
+          </>
+        )}
+        {!isAdmin && item.status === 'Pending' && (
           <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={() => handleConfirm(item.id, item.petId, item)}
+            style={styles.cancelButton}
+            onPress={() => handleCancel(item.id)}
           >
-            <Text style={styles.buttonText}>Confirm</Text>
+            <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.rejectButton}
-            onPress={() => handleReject(item.id)}
-          >
-            <Text style={styles.buttonText}>Reject</Text>
-          </TouchableOpacity>
-        </View>
+        )}
+      </View>
+      {item.status !== 'Pending' && (
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDelete(item.id)}
+        >
+          <Text style={styles.buttonText}>Delete</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
-
 
   return (
     <View style={styles.container}>
@@ -222,7 +276,7 @@ const styles = StyleSheet.create({
     color: Colors.GRAY,
     marginTop: 20,
   },
-  adminActions: {
+  actions: {
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -236,6 +290,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.PRIMARY,
     padding: 5,
     borderRadius: 5,
+  },
+  cancelButton: {
+    backgroundColor: Colors.RED,
+    padding: 5,
+    borderRadius: 5,
+  },
+  deleteButton: {
+    backgroundColor: Colors.RED,
+    padding: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     color: Colors.WHITE,
