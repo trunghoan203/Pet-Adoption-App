@@ -101,6 +101,19 @@ export default function Order() {
     }
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Done':
+        return Colors.GREEN;
+      case 'Pending':
+        return Colors.PRIMARY;
+      case 'Reject':
+        return Colors.RED;
+      default:
+        return Colors.GRAY;
+    }
+  };
+
   const renderOrderItem = ({ item }) => (
     <View style={styles.orderItem}>
       <Image
@@ -111,7 +124,9 @@ export default function Order() {
         <Text style={styles.orderText}>Full Name: {item.fullName}</Text>
         <Text style={styles.orderText}>Phone: {item.phone}</Text>
         <Text style={styles.orderText}>Email: {item.email}</Text>
-        <Text style={styles.orderText}>Status: {item.status}</Text>
+        <Text style={styles.orderText}>Status:
+          <Text style={{ color: getStatusColor(item.status) }}> {item.status}</Text>
+        </Text>
         <Text style={styles.orderText}>Request Date: {item.requestDate.toDate().toLocaleDateString()}</Text>
       </View>
 
@@ -134,9 +149,10 @@ export default function Order() {
     </View>
   );
 
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Adoption Requests</Text>
+      <Text style={styles.header}>Request List</Text>
       {loading ? (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color={Colors.PRIMARY} />

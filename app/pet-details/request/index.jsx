@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
         fontFamily: 'outfit-bold',
         marginBottom: 20,
         color: Colors.PRIMARY,
+        textAlign: "center"
     },
     input: {
         padding: 15,

@@ -103,7 +103,7 @@ export default function SignUp() {
                 <Text style={styles.createButtonText}>Create Account</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.push('auth/signin')} style={styles.signInButton}>
+            <TouchableOpacity onPress={() => router.replace('auth/signin')} style={styles.signInButton}>
                 <Text style={styles.signInButtonText}>Sign In</Text>
             </TouchableOpacity>
         </View>
