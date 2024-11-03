@@ -22,7 +22,7 @@ export default function ManagePet() {
                     const userData = userDoc.data();
                     if (userData.isAdmin !== 1) {
                         Alert.alert("Access Denied", "Only Admins can access this page.");
-                        router.replace("/home");
+                        // router.replace("/home");
                     } else {
                         fetchAllPets();
                     }

@@ -30,8 +30,8 @@ export default function PetListCategory() {
       <Category category={(value) => GetPetList(value)} />
       <FlatList
         data={petList}
+        numColumns={2}
         style={{ marginTop: 10 }}
-        horizontal={true}
         refreshing={loader}
         onRefresh={() => GetPetList('Bird')}
         renderItem={({ item, index }) => (

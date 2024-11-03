@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Shared from './../Shared/Shared';
 import { getAuth } from "firebase/auth";
+import Colors from '../constants/Colors';
 
-export default function MarkFav({ pet, color = 'black' }) {
+export default function MarkFav({ pet }) {
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -39,7 +40,7 @@ export default function MarkFav({ pet, color = 'black' }) {
                 </Pressable>
             ) : (
                 <Pressable onPress={AddToFav}>
-                    <Ionicons name="heart-outline" size={30} color={color} />
+                    <Ionicons name="heart-outline" size={30} color={Colors.PRIMARY} />
                 </Pressable>
             )}
         </View>
