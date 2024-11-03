@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation, useRouter, useLocalSearchParams } from 'expo-router';
 import Colors from '../../../constants/Colors';
 import { db, storage } from '../../../config/FirebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { getAuth } from "firebase/auth";
 
@@ -17,6 +17,7 @@ export default function RequestAdopt() {
     const [imageUrl, setImageUrl] = useState('');
     const [loader, setLoader] = useState(false);
     const [message, setMessage] = useState('');
+    const [petName, setPetName] = useState(''); // State for pet name
     const router = useRouter();
     const navigation = useNavigation();
     const user = getAuth().currentUser;
@@ -25,7 +26,21 @@ export default function RequestAdopt() {
         navigation.setOptions({
             headerShown: false,
         });
+        fetchPetName(); // Fetch pet name on component load
     }, []);
+
+    // Fetch the pet's name based on petId
+    const fetchPetName = async () => {
+        if (!petId) return;
+        try {
+            const petDoc = await getDoc(doc(db, 'Pets', petId));
+            if (petDoc.exists()) {
+                setPetName(petDoc.data().name); // Set the pet's name
+            }
+        } catch (error) {
+            console.error('Error fetching pet name:', error);
+        }
+    };
 
     const imagePicker = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -86,13 +101,15 @@ export default function RequestAdopt() {
         try {
             await setDoc(doc(db, 'AdoptionRequests', `${petId}_${user.uid}`), {
                 petId,
+                petName,
                 userId: user.uid,
                 fullName,
                 phone,
                 email,
-                userImage: downloadURL, // Use the uploaded image URL
+                userImage: downloadURL,
                 status: 'Pending',
                 requestDate: new Date(),
+                message
             });
 
             Alert.alert('Request Sent', 'Your adoption request has been sent to the admin.');
@@ -105,7 +122,16 @@ export default function RequestAdopt() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.headerText}>Adoption Request</Text>
+            <Text style={styles.headerText}>Adoption Request for {petName}</Text>
+
+            <Text style={styles.inputAvt}>Please choose your avatar</Text>
+            <Pressable onPress={imagePicker} style={styles.imagePicker}>
+                {!userImage ? (
+                    <Image source={require('../../../assets/images/placeholder-user.jpg')} style={styles.placeholderImage} />
+                ) : (
+                    <Image source={{ uri: userImage }} style={styles.image} />
+                )}
+            </Pressable>
 
             <TextInput
                 style={styles.input}
@@ -132,14 +158,6 @@ export default function RequestAdopt() {
                 onChangeText={setEmail}
                 keyboardType="email-address"
             />
-
-            <Pressable onPress={imagePicker} style={styles.imagePicker}>
-                {!userImage ? (
-                    <Image source={require('../../../assets/images/placeholder-user.jpg')} style={styles.placeholderImage} />
-                ) : (
-                    <Image source={{ uri: userImage }} style={styles.image} />
-                )}
-            </Pressable>
 
             <TextInput
                 style={[styles.input, styles.messageInput]}
@@ -169,7 +187,14 @@ const styles = StyleSheet.create({
         fontFamily: 'outfit-bold',
         marginBottom: 20,
         color: Colors.PRIMARY,
-        textAlign: "center"
+        textAlign: "center",
+    },
+    inputAvt: {
+        fontFamily: "outfit-medium",
+        fontSize: 16,
+        textAlign: "center",
+        marginTop: 10,
+        color: Colors.GRAY,
     },
     input: {
         padding: 15,
