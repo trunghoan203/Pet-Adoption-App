@@ -43,7 +43,7 @@ export default function Profile() {
 
   const Menu = [
     { id: 1, name: 'Change Password', icon: 'bookmark', path: '/../changepassword' },
-    { id: 2, name: 'Profile Detail', icon: 'pricetag', path: '/../changepassword' },
+    { id: 2, name: 'Profile Detail', icon: 'pricetag', path: '/../profile-detail' },
     { id: 3, name: 'Logout', icon: 'exit' },
   ];
 
@@ -93,11 +93,15 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    marginTop: 10,
+    marginTop: 20,
   },
   headerText: {
-    fontFamily: 'outfit-medium',
-    fontSize: 30,
+    fontSize: 24,
+    fontFamily: 'outfit-bold',
+    color: Colors.PRIMARY,
+    marginBottom: 20,
+    textAlign: 'center',
+    marginTop: 20,
   },
   profileInfo: {
     display: 'flex',

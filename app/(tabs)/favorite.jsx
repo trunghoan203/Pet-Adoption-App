@@ -1,4 +1,4 @@
-import { View, Text, FlatList, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Shared from './../../Shared/Shared';
 import { db } from '../../config/FirebaseConfig';
@@ -21,7 +21,6 @@ export default function Favorite() {
     }
   }, [user]);
 
-  // Fetch favorite pet IDs
   const GetFavPetIds = async () => {
     try {
       setLoader(true);
@@ -42,7 +41,6 @@ export default function Favorite() {
     }
   };
 
-  // Fetch pet details for favorite IDs
   const GetFavPetList = async (favId_) => {
     if (favId_.length === 0) return;
 
@@ -50,7 +48,6 @@ export default function Favorite() {
       const petList = [];
       const chunks = [];
 
-      // Split favId_ into chunks of 10
       for (let i = 0; i < favId_.length; i += 10) {
         chunks.push(favId_.slice(i, i + 10));
       }
@@ -71,18 +68,11 @@ export default function Favorite() {
   };
 
   return (
-    <View style={{ flex: 1, padding: 10, marginTop: 30 }}>
-      <Text style={{
-        fontSize: 24,
-        fontFamily: 'outfit-bold',
-        color: Colors.PRIMARY,
-        marginBottom: 20,
-        textAlign: 'center',
-        marginTop: 20
-      }}>Favorite</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Favorite Pets</Text>
 
       {loader ? (
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator size="large" color={Colors.PRIMARY} />
       ) : (
         <FlatList
           data={favPetList}
@@ -90,20 +80,14 @@ export default function Favorite() {
           onRefresh={GetFavPetIds}
           refreshing={loader}
           renderItem={({ item }) => (
-            <View>
+            <View style={styles.petItem}>
               <PetListItem pet={item} />
             </View>
           )}
           keyExtractor={(item, index) => item.id || index.toString()}
           ListEmptyComponent={
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-              <Text style={{
-                fontFamily: 'outfit',
-                fontSize: 20,
-                textAlign: 'center',
-              }}>
-                No favorite pets found.
-              </Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No favorite pets found.</Text>
             </View>
           }
         />
@@ -111,3 +95,33 @@ export default function Favorite() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+    marginTop: 30,
+  },
+  header: {
+    fontSize: 24,
+    fontFamily: 'outfit-bold',
+    color: Colors.PRIMARY,
+    marginBottom: 20,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  petItem: {
+    marginBottom: 15
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    fontFamily: 'outfit',
+    fontSize: 20,
+    textAlign: 'center',
+  },
+});
