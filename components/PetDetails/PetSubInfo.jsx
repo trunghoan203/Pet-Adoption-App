@@ -1,42 +1,43 @@
-import { View, Text, Image } from 'react-native'
-import React from 'react'
-import PetSubInfoCard from './PetSubInfoCard'
+import { View, StyleSheet } from 'react-native';
+import React from 'react';
+import PetSubInfoCard from './PetSubInfoCard';
 
 export default function PetSubInfo({ pet }) {
     return (
-        <View style={{
-            paddingHorizontal: 20
-        }}>
-            <View style={{
-                display: 'flex',
-                flexDirection: 'row'
-            }}>
+        <View style={styles.container}>
+            <View style={styles.row}>
                 <PetSubInfoCard
                     icon={require('./../../assets/images/calendar.png')}
-                    title={'Age'}
-                    value={pet?.age + " Years"}
+                    title="Age"
+                    value={`${pet?.age} Years`}
                 />
                 <PetSubInfoCard
                     icon={require('./../../assets/images/bone.png')}
-                    title={'Breed'}
+                    title="Breed"
                     value={pet?.breed}
                 />
             </View>
-            <View style={{
-                display: 'flex',
-                flexDirection: 'row'
-            }}>
+            <View style={styles.row}>
                 <PetSubInfoCard
                     icon={require('./../../assets/images/sex.png')}
-                    title={'Sex'}
+                    title="Sex"
                     value={pet?.sex}
                 />
                 <PetSubInfoCard
                     icon={require('./../../assets/images/weight.png')}
-                    title={'Weight'}
-                    value={pet?.weight + " Kg"}
+                    title="Weight"
+                    value={`${pet?.weight} Kg`}
                 />
             </View>
         </View>
-    )
+    );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 20,
+    },
+    row: {
+        flexDirection: 'row',
+    },
+});

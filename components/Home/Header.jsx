@@ -1,13 +1,15 @@
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/FirebaseConfig';
-import DefaultAvatar from '../../components/UserAvt/DefaultAvatar'; // Adjust path as necessary
+import DefaultAvatar from '../../components/UserAvt/DefaultAvatar';
+import { useRouter } from 'expo-router';
 
 export default function Header() {
     const [user, setUser] = useState(null);
-    const [role, setRole] = useState(''); // Default to 'User'
+    const [role, setRole] = useState('User');
+    const router = useRouter();
 
     useEffect(() => {
         const auth = getAuth();
@@ -15,17 +17,12 @@ export default function Header() {
         setUser(currentUser);
 
         if (currentUser) {
-            // Fetch the user's role from Firestore
             const fetchUserRole = async () => {
                 try {
                     const userDoc = await getDoc(doc(db, 'User', currentUser.uid));
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        if (userData.isAdmin === 1) {
-                            setRole('Admin');
-                        } else if (userData.isUser === 1) {
-                            setRole('User');
-                        }
+                        setRole(userData.isAdmin === 1 ? 'Admin' : 'User');
                     }
                 } catch (error) {
                     console.error('Error fetching user role:', error);
@@ -36,36 +33,49 @@ export default function Header() {
         }
     }, []);
 
+    const navigateToProfile = () => {
+        router.push('/profile');
+    };
+
     return (
-        <View style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: 20
-        }}>
+        <View style={styles.container}>
             <View>
-                <Text style={{
-                    fontFamily: 'outfit',
-                    fontSize: 18,
-                }}>Welcome {role},</Text>
-                <Text style={{
-                    fontFamily: 'outfit-medium',
-                    fontSize: 25,
-                }}>{user?.displayName || "User"}</Text>
+                <Text style={styles.welcomeText}>Welcome {role},</Text>
+                <Text style={styles.userName}>{user?.displayName || "User"}</Text>
             </View>
-            {user?.photoURL ? (
-                <Image
-                    source={{ uri: user.photoURL }}
-                    style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 99,
-                    }}
-                />
-            ) : (
-                <DefaultAvatar name={user?.displayName || "User"} size={40} />
-            )}
+            <TouchableOpacity onPress={navigateToProfile}>
+                {user?.photoURL ? (
+                    <Image
+                        source={{ uri: user.photoURL }}
+                        style={styles.avatar}
+                    />
+                ) : (
+                    <DefaultAvatar name={user?.displayName || "User"} size={40} />
+                )}
+            </TouchableOpacity>
         </View>
     );
 }
+
+const styles = {
+    container: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 20
+    },
+    welcomeText: {
+        fontFamily: 'outfit',
+        fontSize: 18,
+    },
+    userName: {
+        fontFamily: 'outfit-medium',
+        fontSize: 25,
+    },
+    avatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+    }
+};

@@ -4,7 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import Colors from '../../constants/Colors';
 import { getAuth, signOut } from "firebase/auth";
-import DefaultAvatar from '../../components/UserAvt/DefaultAvatar'; // Adjust path as necessary
+import DefaultAvatar from '../../components/UserAvt/DefaultAvatar';
 
 export default function Profile() {
   const router = useRouter();

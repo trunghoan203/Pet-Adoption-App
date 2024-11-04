@@ -109,7 +109,6 @@ export default function RequestAdopt() {
                 userImage: downloadURL,
                 status: 'Pending',
                 requestDate: new Date(),
-                message
             });
 
             Alert.alert('Request Sent', 'Your adoption request has been sent to the admin.');
@@ -159,14 +158,14 @@ export default function RequestAdopt() {
                 keyboardType="email-address"
             />
 
-            <TextInput
+            {/* <TextInput
                 style={[styles.input, styles.messageInput]}
                 placeholder="Why do you want to adopt this pet?"
                 placeholderTextColor={Colors.GRAY}
                 value={message}
                 onChangeText={setMessage}
                 multiline
-            />
+            /> */}
 
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={loader}>
                 {loader ? <ActivityIndicator size="large" color={Colors.WHITE} /> : <Text style={styles.submitButtonText}>Submit Request</Text>}

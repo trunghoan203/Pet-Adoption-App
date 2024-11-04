@@ -120,6 +120,7 @@ export default function Home() {
 
   const renderDashboard = () => (
     <View style={styles.dashboardContainer}>
+      <Header />
       <Text style={styles.header}>Admin Dashboard</Text>
       <View style={styles.statRow}>
         <View style={styles.statBox}>
