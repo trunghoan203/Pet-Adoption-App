@@ -1,9 +1,9 @@
 import { View, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Shared from './../Shared/Shared';
+import Shared from './../../Shared/Shared';
 import { getAuth } from "firebase/auth";
-import Colors from '../constants/Colors';
+import Colors from './../../constants/Colors';
 
 export default function MarkFav({ pet }) {
     const auth = getAuth();

@@ -4,7 +4,6 @@ import Colors from '../../constants/Colors';
 import { useRouter } from 'expo-router';
 
 export default function Login() {
-
     const router = useRouter();
 
     // Data array with a single item to enable FlatList functionality
@@ -14,25 +13,13 @@ export default function Login() {
         <View>
             <Image
                 source={require('../../assets/images/login.png')}
-                style={{
-                    width: '100%',
-                    height: 450
-                }}
+                style={styles.image}
             />
             <View style={styles.container}>
-                <Text style={{
-                    fontSize: 30,
-                    textAlign: 'center',
-                    marginTop: 10
-                }}>
+                <Text style={styles.title}>
                     Ready to make a new friend?
                 </Text>
-                <Text style={{
-                    fontSize: 17,
-                    textAlign: 'center',
-                    color: Colors.GRAY,
-                    marginTop: 20
-                }}>
+                <Text style={styles.subtitle}>
                     Let's adopt the pet which you like and make their life happy again.
                 </Text>
 
@@ -40,11 +27,7 @@ export default function Login() {
                     style={styles.button}
                     onPress={() => router.replace('auth/signin')}
                 >
-                    <Text style={{
-                        color: Colors.WHITE,
-                        textAlign: "center",
-                        fontSize: 20
-                    }}>
+                    <Text style={styles.buttonText}>
                         Get Started
                     </Text>
                 </TouchableOpacity>
@@ -57,12 +40,16 @@ export default function Login() {
             data={data}
             renderItem={renderItem}
             keyExtractor={item => item.key}
-            contentContainerStyle={{ flexGrow: 1 }}
+            contentContainerStyle={styles.flatListContent}
         />
     );
 }
 
 const styles = StyleSheet.create({
+    image: {
+        width: '100%',
+        height: 450,
+    },
     container: {
         backgroundColor: Colors.WHITE,
         marginTop: -20,
@@ -72,10 +59,29 @@ const styles = StyleSheet.create({
         padding: 25,
         paddingBottom: 50,
     },
+    title: {
+        fontSize: 30,
+        textAlign: 'center',
+        marginTop: 10,
+    },
+    subtitle: {
+        fontSize: 17,
+        textAlign: 'center',
+        color: Colors.GRAY,
+        marginTop: 20,
+    },
     button: {
         padding: 15,
         backgroundColor: Colors.PRIMARY,
         borderRadius: 99,
         marginTop: '20%',
-    }
+    },
+    buttonText: {
+        color: Colors.WHITE,
+        textAlign: "center",
+        fontSize: 20,
+    },
+    flatListContent: {
+        flexGrow: 1,
+    },
 });

@@ -2,7 +2,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
 import Colors from '../../constants/Colors';
 import { useRouter } from 'expo-router';
-import MarkFav from '../MarkFav';
+import MarkFav from './../FavoritePet/MarkFav';
 
 export default function PetListItem({ pet }) {
   const router = useRouter();
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     backgroundColor: Colors.WHITE,
     borderRadius: 10,
-    marginBottom: 15
+    marginBottom: 10
   },
   favIconContainer: {
     position: 'absolute',
