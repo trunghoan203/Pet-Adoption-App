@@ -36,6 +36,10 @@ export default function Order() {
         id: doc.id,
         ...doc.data(),
       }));
+
+      // Sort ordersData by requestDate in descending order (newest to oldest)
+      ordersData.sort((a, b) => b.requestDate.toDate() - a.requestDate.toDate());
+
       setOrders(ordersData);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -44,6 +48,7 @@ export default function Order() {
       setRefreshing(false);
     }
   };
+
 
   useEffect(() => {
     const initializeOrders = async () => {

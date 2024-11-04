@@ -88,14 +88,31 @@ export default function RequestAdopt() {
             return;
         }
 
-        if (!fullName || !phone || !email || !userImage) {
-            const errorMsg = 'Please fill in all required fields';
+        // Phone number validation
+        const phoneRegex = /^0\d{9}$/; // Starts with 0 and has exactly 10 digits
+        if (!phoneRegex.test(phone)) {
+            const errorMsg = 'Phone number must start with 0 and contain exactly 10 digits.';
+            Platform.OS === 'android' ? ToastAndroid.show(errorMsg, ToastAndroid.LONG) : Alert.alert('Error', errorMsg);
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email format validation
+        if (!emailRegex.test(email)) {
+            const errorMsg = 'Please enter a valid email address.';
+            Platform.OS === 'android' ? ToastAndroid.show(errorMsg, ToastAndroid.LONG) : Alert.alert('Error', errorMsg);
+            return;
+        }
+
+        if (!fullName || !userImage) {
+            const errorMsg = 'Please fill in all required fields.';
             Platform.OS === 'android' ? ToastAndroid.show(errorMsg, ToastAndroid.LONG) : Alert.alert('Error', errorMsg);
             return;
         }
 
         uploadUserImage();
     };
+
 
     const saveFormData = async (downloadURL) => {
         try {
@@ -157,15 +174,6 @@ export default function RequestAdopt() {
                 onChangeText={setEmail}
                 keyboardType="email-address"
             />
-
-            {/* <TextInput
-                style={[styles.input, styles.messageInput]}
-                placeholder="Why do you want to adopt this pet?"
-                placeholderTextColor={Colors.GRAY}
-                value={message}
-                onChangeText={setMessage}
-                multiline
-            /> */}
 
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={loader}>
                 {loader ? <ActivityIndicator size="large" color={Colors.WHITE} /> : <Text style={styles.submitButtonText}>Submit Request</Text>}
