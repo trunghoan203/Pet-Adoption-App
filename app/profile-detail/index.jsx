@@ -4,7 +4,7 @@ import { getAuth } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/FirebaseConfig';
 import Colors from '../../constants/Colors';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 
 export default function ProfileDetail() {
     const auth = getAuth();
@@ -51,10 +51,17 @@ export default function ProfileDetail() {
 
     // Handle updating user profile in Firestore
     const handleUpdateProfile = async () => {
+        // Phone number validation
+        const phoneRegex = /^0\d{9}$/; // Starts with 0 and has exactly 10 digits
+        if (!phoneRegex.test(userData.phone)) {
+            Alert.alert('Error', 'Phone number must start with 0 and contain exactly 10 digits.');
+            return;
+        }
         try {
             setUpdating(true);
             await updateDoc(doc(db, 'User', user.uid), userData);
             Alert.alert('Success', 'Profile updated successfully');
+            router.replace("/profile");
         } catch (error) {
             Alert.alert('Error', 'Failed to update profile');
         } finally {
@@ -92,6 +99,7 @@ export default function ProfileDetail() {
             <TextInput
                 style={styles.input}
                 value={userData.phone}
+                keyboardType="phone-pad"
                 onChangeText={(text) => setUserData({ ...userData, phone: text })}
             />
 
