@@ -16,7 +16,6 @@ export default function RequestAdopt() {
     const [userImage, setUserImage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [loader, setLoader] = useState(false);
-    const [message, setMessage] = useState('');
     const [petName, setPetName] = useState(''); // State for pet name
     const router = useRouter();
     const navigation = useNavigation();

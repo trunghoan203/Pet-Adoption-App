@@ -110,7 +110,7 @@ export default function EditPet() {
             });
             setLoader(false);
             Alert.alert('Success', 'Pet updated successfully!');
-            router.replace('/(tabs)/home');
+            router.replace('/(tabs)/managepet');
         } catch (error) {
             console.error("Error updating pet data: ", error);
             Alert.alert("Error", "Failed to update pet data.");
@@ -250,15 +250,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     placeholderImage: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         borderRadius: 15,
         borderWidth: 1,
         borderColor: Colors.GRAY,
     },
     image: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         borderRadius: 15,
     }
 });
