@@ -27,19 +27,8 @@ export default function SignIn() {
         }
 
         signInWithEmailAndPassword(auth, email, password)
-            .then(async (userCredential) => {
-                const user = userCredential.user;
-
-                // Check if the user is an admin
-                const userDoc = await getDoc(doc(db, 'User', user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData.isAdmin === 1) {
-                        router.replace('/home'); // Redirect to Dashboard for Admin
-                    } else {
-                        router.replace('/home'); // Redirect to Home for regular users
-                    }
-                }
+            .then(() => {
+                router.replace('/home');
             })
             .catch((error) => {
                 let errorMessage;

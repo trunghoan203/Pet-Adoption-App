@@ -92,7 +92,7 @@ export default function AddNewPet() {
             id: docId
         });
         setLoader(false);
-        router.replace('/(tabs)/home');
+        router.replace('/(tabs)/managepet');
     };
 
     return (
@@ -200,15 +200,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     placeholderImage: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         borderRadius: 15,
         borderWidth: 1,
         borderColor: Colors.GRAY,
     },
     image: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         borderRadius: 15,
     }
 });

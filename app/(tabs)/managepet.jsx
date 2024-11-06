@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert, Image, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, RefreshControl } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, doc, getDocs, deleteDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/FirebaseConfig';
@@ -7,9 +7,10 @@ import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { getAuth } from "firebase/auth";
 
-export default function ManagePet() {
+export default function ManagePet(pet) {
     const [petList, setPetList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(false); // Add refreshing state
     const [isAdmin, setIsAdmin] = useState(false); // State to track admin access
     const router = useRouter();
     const auth = getAuth();
@@ -46,7 +47,13 @@ export default function ManagePet() {
             Alert.alert("Error", "Failed to load pets. Please try again.");
         } finally {
             setLoading(false);
+            setRefreshing(false); // Stop the refreshing indicator
         }
+    };
+
+    const onRefresh = () => {
+        setRefreshing(true); // Start the refreshing indicator
+        fetchAllPets(); // Refresh the pet list
     };
 
     const confirmDelete = (petId) => {
@@ -82,7 +89,12 @@ export default function ManagePet() {
                 )}
             </View>
 
-            <ScrollView contentContainerStyle={styles.petListContainer}>
+            <ScrollView
+                contentContainerStyle={styles.petListContainer}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
                 {loading ? (
                     <Text style={styles.loadingText}>Loading pets...</Text>
                 ) : (
@@ -90,7 +102,7 @@ export default function ManagePet() {
                         <TouchableOpacity
                             key={pet.id}
                             style={styles.petCard}
-                            onPress={() => router.push({ pathname: '/pet-details', params: { id: pet.id } })}
+                            onPress={() => router.push({ pathname: '/pet-details', params: pet })}
                         >
                             <Image source={{ uri: pet.imageUrl }} style={styles.petImage} />
                             <View style={styles.petDetails}>
